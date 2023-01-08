@@ -14,7 +14,7 @@ Docker
 
 Docker kann in der VM sowie vom lokalen Notebook aus verwendet werden. Allerdings sind es zwei Instanzen, d.h. Docker Container/Images sind nur in der einen oder anderen Umgebung sichtbar.
 
-**VM**
+### VM
 
 Einloggen via SSH oder Shell in a Box in die VM.
 
@@ -24,7 +24,9 @@ Einfacher Container starten:
     
 Die Webseite des Containers kann mittels http://${ADDR}:8091 angezeigt werden.
 
-**Lokaler Notebook**
+### Lokaler Notebook
+
+Diese Umgebung ist zum Builden und einfachen Tests von Containern gedacht. 
 
 * Docker CLI von [hier](https://download.docker.com/win/static/stable/x86_64/) downloaden und nur docker.exe ablegen
 * Umgebungsvariable DOCKER_HOST auf tcp://${ADDR}:2375 setzen
@@ -34,8 +36,29 @@ Einfacher Container starten:
     docker run --name hello-world -d -p 8080:80 registry.gitlab.com/mc-b/misegr/hello-world
     
 Die Webseite des Containers kann mittels http://${ADDR}:8080 angezeigt werden.
-  
+
 **ACHTUNG**: weil diese Docker Umgebung als "Docker in Docker" läuft, sind nur Ports 8080 - 8089 verfügbar.
+
+**Container Image builden**
+
+Datei `index.php`mit folgendem Inhalt erstellen:
+
+    <?php echo '<p>Ich bin in einem Container am laufen</p>'; ?>
+
+Datei `Dockerfile` mit folgendem Inhalt erstellen:
+
+    FROM public.ecr.aws/docker/library/php:7.4-apache
+    COPY index.php /var/www/html/
+   
+Alles in ein Container Image verpacken:
+
+    docker build -t myservice .
+    
+Container starten:
+
+    docker run --name myservice -d -p 8081:80 myservice
+    
+Die Webseite des Containers kann mittels http://${ADDR}:8081 angezeigt werden.    
 
 Podman
 ------
@@ -59,7 +82,7 @@ Ist eine Kubernetes Distrubution für Ubuntu.
 
 Die Umgebung ist so konzipiert, dass das Kubernetes CLI `kubectl` in der VM oder vom lokalen Notebook funktionert.
 
-**VM**
+### VM
 
 Einloggen via SSH oder Shell in a Box in die VM.
 
@@ -74,7 +97,7 @@ Anzeige laufender Container inkl. Service
     
 Die Webseite des Containers kann mittels http://${ADDR}:<gemappter Port> angezeigt werden.
 
-**Lokaler Notebook**
+### Lokaler Notebook
     
 Einloggen via SSH oder Shell in a Box in die VM.
 
@@ -87,3 +110,4 @@ Der angezeigte Inhalt auf dem Notebook im Home Verzeichnis als Datei `.kube/conf
 Anschliessend IP-Adresse im Eintrag `server:` auf ${ADDR} ändern und das `kubectl` CLI auf dem Notebook herunterladen, siehe [hier](https://kubernetes.io/docs/tasks/tools/).
 
 Nun kann das `kubectl` CLI wie in der VM verwendet werden.
+
